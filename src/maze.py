@@ -1,9 +1,10 @@
+import random
 import time
 from cell import Cell
 from graphics import Window
 
 class Maze:
-    def __init__(self, x: int, y: int, num_rows: int, num_cols: int, cell_size_x: int, cell_size_y: int, window: Window = None):
+    def __init__(self, x: int, y: int, num_rows: int, num_cols: int, cell_size_x: int, cell_size_y: int, window: Window = None, seed = None):
         self.__x = x
         self.__y = y
         self.__num_rows = num_rows
@@ -14,6 +15,9 @@ class Maze:
         self._cells = []
         self.__create_cells()
         self.__break_entrance_and_exit()
+        if seed:
+            random.seed(seed)
+        self.__break_walls(0, 0)
     
     def __animate(self):
         if self.__window is None:
@@ -28,6 +32,44 @@ class Maze:
         exit: Cell = self._cells[self.__num_cols - 1][self.__num_rows - 1]
         exit.has_bottom_wall = False
         self.__draw_cell(self.__num_cols - 1, self.__num_rows - 1)
+    
+    def __break_walls(self, i: int, j: int):
+        self._cells[i][j].visited = True
+        while True:
+            next_index_list = []
+            # Check adjacent cells for possible directions
+            # Left
+            if i > 0 and not self._cells[i - 1][j].visited:
+                next_index_list.append((i - 1, j))
+            # Right
+            if i < self.__num_cols - 1 and not self._cells[i + 1][j].visited:
+                next_index_list.append((i + 1, j))
+            # Top
+            if j > 0 and not self._cells[i][j + 1].visited:
+                next_index_list.append((i, j + 1))
+            # Bottom
+            if j < self.__num_rows - 1 and not self._cells[i][j - 1].visited:
+                next_index_list.append((i, j - 1))
+            # Return if no possible direction is available
+            if len(next_index_list) == 0:
+                self.__draw_cell(i, j)
+                return
+            # Pick random direction
+            next_index = next_index_list[random.randrange(len(next_index_list))]
+            # Break the wall between the current and next cell
+            if next_index[0] == i - 1:
+                self._cells[i][j].has_left_wall = False
+                self._cells[next_index[0]][next_index[1]].has_right_wall = False
+            elif next_index[0] == i + 1:
+                self._cells[i][j].has_right_wall = False
+                self._cells[next_index[0]][next_index[1]].has_left_wall = False
+            elif next_index[1] == j + 1:
+                self._cells[i][j].has_top_wall = False
+                self._cells[next_index[0]][next_index[1]].has_botto_wall = False
+            elif next_index[1] == j - 1:
+                self._cells[i][j].has_bottom_wall = False
+                self._cells[next_index[0]][next_index[1]] = False
+            self.__break_walls(next_index[0], next_index[1])
     
     def __create_cells(self):
         for i in range(self.__num_cols):

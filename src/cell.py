@@ -11,6 +11,7 @@ class Cell:
         self.__x2 = None
         self.__y2 = None
         self.__window = window
+        self.visited = False
     
     def __cell_center(self):
         x_center = self.__x1 + (abs(self.__x2 - self.__x1) // 2)
