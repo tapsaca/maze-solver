@@ -18,6 +18,7 @@ class Maze:
         if seed:
             random.seed(seed)
         self.__break_walls(0, 0)
+        self.__reset_cells_visited()
     
     def __animate(self):
         if self.__window is None:
@@ -45,11 +46,11 @@ class Maze:
             if i < self.__num_cols - 1 and not self._cells[i + 1][j].visited:
                 next_index_list.append((i + 1, j))
             # Top
-            if j > 0 and not self._cells[i][j + 1].visited:
-                next_index_list.append((i, j + 1))
-            # Bottom
-            if j < self.__num_rows - 1 and not self._cells[i][j - 1].visited:
+            if j > 0 and not self._cells[i][j - 1].visited:
                 next_index_list.append((i, j - 1))
+            # Bottom
+            if j < self.__num_rows - 1 and not self._cells[i][j + 1].visited:
+                next_index_list.append((i, j + 1))
             # Return if no possible direction is available
             if len(next_index_list) == 0:
                 self.__draw_cell(i, j)
@@ -63,12 +64,12 @@ class Maze:
             elif next_index[0] == i + 1:
                 self._cells[i][j].has_right_wall = False
                 self._cells[next_index[0]][next_index[1]].has_left_wall = False
-            elif next_index[1] == j + 1:
-                self._cells[i][j].has_top_wall = False
-                self._cells[next_index[0]][next_index[1]].has_botto_wall = False
             elif next_index[1] == j - 1:
+                self._cells[i][j].has_top_wall = False
+                self._cells[next_index[0]][next_index[1]].has_bottom_wall = False
+            elif next_index[1] == j + 1:
                 self._cells[i][j].has_bottom_wall = False
-                self._cells[next_index[0]][next_index[1]] = False
+                self._cells[next_index[0]][next_index[1]].has_top_wall = False
             self.__break_walls(next_index[0], next_index[1])
     
     def __create_cells(self):
@@ -88,3 +89,8 @@ class Maze:
         y2 = y1 + self.__cell_size_y
         self._cells[i][j].draw(x1, y1, x2, y2)
         self.__animate()
+    
+    def __reset_cells_visited(self):
+        for column in self._cells:
+            for cell in column:
+                cell.visited = False

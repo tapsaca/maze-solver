@@ -2,6 +2,7 @@ from graphics import Line, Point, Window
 
 class Cell:
     def __init__(self, window: Window = None):
+        self.visited = False
         self.has_left_wall = True
         self.has_right_wall = True
         self.has_top_wall = True
@@ -11,7 +12,6 @@ class Cell:
         self.__x2 = None
         self.__y2 = None
         self.__window = window
-        self.visited = False
     
     def __cell_center(self):
         x_center = self.__x1 + (abs(self.__x2 - self.__x1) // 2)
