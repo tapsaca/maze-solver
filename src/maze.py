@@ -94,3 +94,38 @@ class Maze:
         for column in self._cells:
             for cell in column:
                 cell.visited = False
+    
+    def solve(self):
+        return self.__solve_r(0, 0)
+
+    def __solve_r(self, i: int, j: int):
+        self.__animate()
+        self._cells[i][j].visited = True
+        if i == self.__num_cols - 1 and j == self.__num_rows - 1:
+            return True
+        # Move to adjacent cell if it has not been visited and there is no wall
+        if i > 0 and not self._cells[i - 1][j].visited and not self._cells[i][j].has_left_wall:
+            self._cells[i][j].draw_move(self._cells[i - 1][j])
+            if self.__solve_r(i - 1, j):
+                return True
+            else:
+                self._cells[i][j].draw_move(self._cells[i - 1][j], True)
+        if i < self.__num_cols - 1 and not self._cells[i + 1][j].visited and not self._cells[i][j].has_right_wall:
+            self._cells[i][j].draw_move(self._cells[i + 1][j])
+            if self.__solve_r(i + 1, j):
+                return True
+            else:
+                self._cells[i][j].draw_move(self._cells[i + 1][j], True)
+        if j > 0 and not self._cells[i][j - 1].visited and not self._cells[i][j].has_top_wall:
+            self._cells[i][j].draw_move(self._cells[i][j - 1])
+            if self.__solve_r(i, j - 1):
+                return True
+            else:
+                self._cells[i][j].draw_move(self._cells[i][j - 1], True)
+        if j < self.__num_rows - 1 and not self._cells[i][j + 1].visited and not self._cells[i][j].has_bottom_wall:
+            self._cells[i][j].draw_move(self._cells[i][j + 1])
+            if self.__solve_r(i, j + 1):
+                return True
+            else:
+                self._cells[i][j].draw_move(self._cells[i][j + 1], True)
+        return False
